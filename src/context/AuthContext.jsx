@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
 
   const fetchProfile = async (user) => {
     setProfileLoading(true);
+    try{
     const { data, error } = await supabase
       .from("profiles")
       .upsert(
@@ -24,19 +25,25 @@ export function AuthProvider({ children }) {
       .single();
 
     if (!error) setProfile(data);
+    } catch(e){
+      console.error("fetchProfile error:", e)
+    } finally {
     setProfileLoading(false);
-  };
+  }};
   useEffect(() => {
     const initSession = async () => {
+      try{
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
 
       if (data.session?.user) {
         await fetchProfile(data.session.user);
       }
-
+    } catch(e){
+      console.error("initSession error:", e)
+    } finally {
       setLoading(false);
-    };
+    }};
 
     initSession();
 
