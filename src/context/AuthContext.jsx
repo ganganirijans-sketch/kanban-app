@@ -77,7 +77,7 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: "https://kanban-app-bice-gamma.vercel.app" },
+      options: { redirectTo: window.location.origin + "/" },
     });
     if (error) throw error;
   };
