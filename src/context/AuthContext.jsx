@@ -27,18 +27,29 @@ export function AuthProvider({ children }) {
     setProfileLoading(false);
   };
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) fetchProfile(session.user);
-      setLoading(false); 
-    });
+    const initSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+
+      if (data.session?.user) {
+        await fetchProfile(data.session.user);
+      }
+
+      setLoading(false);
+    };
+
+    initSession();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
-      if (session?.user) fetchProfile(session.user);
-      else setProfile(null);
+
+      if (session?.user) {
+        await fetchProfile(session.user);
+      } else {
+        setProfile(null);
+      }
     });
 
     return () => subscription.unsubscribe();
@@ -66,7 +77,7 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: 'https://kanban-app-bice-gamma.vercel.app' },
+      options: { redirectTo: "https://kanban-app-bice-gamma.vercel.app" },
     });
     if (error) throw error;
   };
