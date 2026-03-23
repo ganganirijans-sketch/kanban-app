@@ -27,15 +27,6 @@ export function AuthProvider({ children }) {
     setProfileLoading(false);
   };
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-  const code = params.get("code");
-  if (code) {
-    supabase.auth.exchangeCodeForSession(code).then(() => {
-      // Clean the URL after exchange
-      window.history.replaceState({}, document.title, window.location.pathname);
-    });
-  }
-
     const initSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
@@ -58,6 +49,7 @@ export function AuthProvider({ children }) {
         await fetchProfile(session.user);
       } else {
         setProfile(null);
+        setProfileLoading(false);
       }
     });
     console.log("SESSION:", session);
