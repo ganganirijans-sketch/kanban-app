@@ -11,7 +11,8 @@ export default function AuthCallback() {
     supabase.auth.exchangeCodeForSession(window.location.search)
       .then(({ error }) => {
         if (error) {
-          toast.error('Authentication failed')
+          console.error('Auth error: ', error)
+          toast.error(error.message)
           navigate('/login')
         } else {
           toast.success('Signed in!')
