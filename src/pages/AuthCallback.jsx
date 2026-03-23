@@ -7,15 +7,17 @@ export default function AuthCallback() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error || !session) {
-        toast.error('Authentication failed')
-        navigate('/login')
-      } else {
-        toast.success('Signed in!')
-        navigate('/dashboard')
-      }
-    })
+    // ✅ Exchange the ?code= param for a real session first
+    supabase.auth.exchangeCodeForSession(window.location.search)
+      .then(({ error }) => {
+        if (error) {
+          toast.error('Authentication failed')
+          navigate('/login')
+        } else {
+          toast.success('Signed in!')
+          navigate('/dashboard')
+        }
+      })
   }, [])
 
   return (

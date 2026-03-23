@@ -27,6 +27,15 @@ export function AuthProvider({ children }) {
     setProfileLoading(false);
   };
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
+  if (code) {
+    supabase.auth.exchangeCodeForSession(code).then(() => {
+      // Clean the URL after exchange
+      window.history.replaceState({}, document.title, window.location.pathname);
+    });
+  }
+
     const initSession = async () => {
       const { data } = await supabase.auth.getSession();
       setSession(data.session);
@@ -51,6 +60,8 @@ export function AuthProvider({ children }) {
         setProfile(null);
       }
     });
+    console.log("SESSION:", session);
+    console.log("USER:", session?.user);
 
     return () => subscription.unsubscribe();
   }, []);
@@ -77,7 +88,7 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/" },
+      options: { redirectTo: `${window.location.origin}/auth/callback`, },
     });
     if (error) throw error;
   };
