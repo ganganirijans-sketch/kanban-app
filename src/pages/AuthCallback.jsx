@@ -11,19 +11,20 @@ export default function AuthCallback() {
       if (event === 'SIGNED_IN' && session) {
         toast.success('Signed in!')
         subscription.unsubscribe()
-        navigate('/dashboard')
-      } else if (event === 'SIGNED_OUT' || !session) {
-        toast.error('Authentication failed')
-        subscription.unsubscribe()
-        navigate('/login')
+        navigate('/dashboard', { replace: true })
       }
+      // } else if (event === 'SIGNED_OUT' || !session) {
+      //   toast.error('Authentication failed')
+      //   subscription.unsubscribe()
+      //   navigate('/login')
+      // }
     })
 
     // Fallback timeout in case event never fires
     const timeout = setTimeout(() => {
       toast.error('Authentication timed out')
-      navigate('/login')
-    }, 5000)
+      navigate('/login', { replace: true })
+    }, 8000)
 
     return () => {
       subscription.unsubscribe()
