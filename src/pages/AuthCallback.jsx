@@ -7,18 +7,28 @@ export default function AuthCallback() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    // ✅ Exchange the ?code= param for a real session first
-    supabase.auth.exchangeCodeForSession(window.location.search)
-      .then(({ error }) => {
-        if (error) {
-          console.error('Auth error: ', error)
-          toast.error(error.message)
-          navigate('/login')
-        } else {
-          toast.success('Signed in!')
-          navigate('/dashboard')
-        }
-      })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        toast.success('Signed in!')
+        subscription.unsubscribe()
+        navigate('/dashboard')
+      } else if (event === 'SIGNED_OUT' || !session) {
+        toast.error('Authentication failed')
+        subscription.unsubscribe()
+        navigate('/login')
+      }
+    })
+
+    // Fallback timeout in case event never fires
+    const timeout = setTimeout(() => {
+      toast.error('Authentication timed out')
+      navigate('/login')
+    }, 5000)
+
+    return () => {
+      subscription.unsubscribe()
+      clearTimeout(timeout)
+    }
   }, [])
 
   return (
