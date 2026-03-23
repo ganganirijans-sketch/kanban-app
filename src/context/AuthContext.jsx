@@ -51,9 +51,8 @@ export function AuthProvider({ children }) {
         setProfile(null);
         setProfileLoading(false);
       }
+      setLoading(false); 
     });
-    console.log("SESSION:", session);
-    console.log("USER:", session?.user);
 
     return () => subscription.unsubscribe();
   }, []);
