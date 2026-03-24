@@ -11,39 +11,41 @@ export function AuthProvider({ children }) {
 
   const fetchProfile = async (user) => {
     setProfileLoading(true);
-    try{
-    const { data, error } = await supabase
-      .from("profiles")
-      .upsert(
-        {
-          id: user.id,
-          name: user.user_metadata?.full_name || user.email,
-        },
-        { onConflict: "id" },
-      )
-      .select()
-      .single();
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id: user.id,
+            name: user.user_metadata?.full_name || user.email,
+          },
+          { onConflict: "id" },
+        )
+        .select()
+        .single();
 
-    if (!error) setProfile(data);
-    } catch(e){
-      console.error("fetchProfile error:", e)
+      if (!error) setProfile(data);
+    } catch (e) {
+      console.error("fetchProfile error:", e);
     } finally {
-    setProfileLoading(false);
-  }};
+      setProfileLoading(false);
+    }
+  };
   useEffect(() => {
     const initSession = async () => {
-      try{
-      const { data } = await supabase.auth.getSession();
-      setSession(data.session);
+      try {
+        const { data } = await supabase.auth.getSession();
+        setSession(data.session);
 
-      if (data.session?.user) {
-        await fetchProfile(data.session.user);
+        if (data.session?.user) {
+          await fetchProfile(data.session.user);
+        }
+      } catch (e) {
+        console.error("initSession error:", e);
+      } finally {
+        setLoading(false);
       }
-    } catch(e){
-      console.error("initSession error:", e)
-    } finally {
-      setLoading(false);
-    }};
+    };
 
     initSession();
 
@@ -58,7 +60,7 @@ export function AuthProvider({ children }) {
         setProfile(null);
         setProfileLoading(false);
       }
-      setLoading(false); 
+      setLoading(false);
     });
 
     return () => subscription.unsubscribe();
@@ -86,16 +88,25 @@ export function AuthProvider({ children }) {
   const signInWithGoogle = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback`, },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
     if (error) throw error;
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-  setSession(null);
-  setProfile(null);
-  }
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    // Clear local state
+    setSession(null);
+    setProfile(null);
+
+    window.location.href = "/login";
+  };
 
   return (
     <AuthContext.Provider

@@ -20,7 +20,9 @@ export default function AuthCallback() {
 
         if (data.session) {
           toast.success("Signed in!");
-          navigate("/dashboard", { replace: true });
+          setTimeout(() => {
+            navigate("/dashboard", { replace: true });
+          }, 100);
         } else {
           toast.error("No session found");
           navigate("/login", { replace: true });
