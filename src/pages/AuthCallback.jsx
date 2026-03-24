@@ -8,13 +8,22 @@ export default function AuthCallback() {
 
   useEffect(() => {
     const handleSession = async () => {
+
       try {
         const requestUrl = new URL(window.location.href);
         const code = requestUrl.searchParams.get("code");
         if(code){
-          const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-          console.log({data, error})
+
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if(error){
+            console.log("Exchange error: ", error)
+            toast.error("Authentication failed");
+            navigate("/login", { replace: true });
+            return;
+          }
+          await new Promise((res) => setTimeout(res, 200))
         }
+
         const { data, error } = await supabase.auth.getSession();
         console.log({data, error})
         if (error) {
@@ -26,9 +35,7 @@ export default function AuthCallback() {
 
         if (data.session) {
           toast.success("Signed in!");
-          setTimeout(() => {
-            navigate("/dashboard", { replace: true });
-          }, 100);
+          navigate("/dashboard", { replace: true });
         } else {
           toast.error("No session found");
           navigate("/login", { replace: true });
