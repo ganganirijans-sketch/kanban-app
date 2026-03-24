@@ -25,7 +25,6 @@ export default function AuthCallback() {
         }
 
         const { data, error } = await supabase.auth.getSession();
-        console.log({data, error})
         if (error) {
           console.error(error);
           toast.error("Authentication failed");
