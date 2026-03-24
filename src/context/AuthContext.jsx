@@ -33,30 +33,32 @@ export function AuthProvider({ children }) {
   };
   useEffect(() => {
     let isMounted = true;
-        supabase.auth.getSession().then(({data}) =>{
-          if(!isMounted) return;
-          setSession(data.session);
-          setLoading(false);
-          if(data.session?.user) fetchProfile(data.session.user);
-        }).catch(() =>{
-          if(isMounted) setLoading(false);
-        });
 
-        const { data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) => {
-          if(!isMounted) return;  
-          setSession(session);
-          setLoading(false);   
-          if(session?.user){
-            fetchProfile(session.user);
-          } else {
-            setProfile(null);
-            setProfileLoading(false);
-          }   
-        });
-        return () => {
-          isMounted = false;
-          subscription.unsubscribe();
-        };
+    supabase.auth.getSession().then(({ data }) => {
+        if (!isMounted) return;
+        setSession(data.session);
+        setLoading(false);
+        if (data.session?.user) fetchProfile(data.session.user);
+      })
+      .catch(() => {
+        if (isMounted) setLoading(false);
+      });
+
+    const {data: { subscription }} = supabase.auth.onAuthStateChange((_event, session) => {
+      if (!isMounted) return;
+      setSession(session);
+      
+      if (session?.user) {
+        fetchProfile(session.user);
+      } else {
+        setProfile(null);
+        setProfileLoading(false);
+      }
+    });
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signUp = async (name, email, password) => {

@@ -1,33 +1,30 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import toast from "react-hot-toast";
 
 export default function AuthCallback() {
   const navigate = useNavigate();
-  const [error, setError] = useState(null)
+  
   
   useEffect(() => {
-    const code = new URL(window.location.href).searchParams.get("code");
-    if(!code) {
-      toast.error("No auth code found");
-      navigate("/login", { replace: true });
-      return;
-    }
-
-    supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
-      if (error) {
-        console.log("Exchange error: ", error)
-        setError(error.message)
-        toast.error("Auth failed");
-        navigate("/login", { replace: true });
-        
-      } else if (data.session){
-        toast.error("Signed In");
-        navigate("/dashboard", { replace: true });
+    const { data: {subscription}} = supabase.auth.onAuthStateChange((event, session) => {
+      if(event === "SIGNED_IN" && session) {
+        toast.success("Signed in");
+        subscription.unsubscribe();
+        navigate("/dashboard", {replace: true})
       }
+    });
 
-    })
+    const timeout = setTimeOut(() => {
+      toast.error("Authentication timed out");
+      navigate("/login", {replace: true});
+    }, 8000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    }
   }, [])
 
   return (
