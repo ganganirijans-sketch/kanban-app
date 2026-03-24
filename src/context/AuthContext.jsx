@@ -32,9 +32,11 @@ export function AuthProvider({ children }) {
     }
   };
   useEffect(() => {
+    let isMounted = true;
     const initSession = async () => {
       try {
         const { data } = await supabase.auth.getSession();
+        if (!isMounted)  return;
         setSession(data.session);
 
         if (data.session?.user) {
@@ -43,7 +45,7 @@ export function AuthProvider({ children }) {
       } catch (e) {
         console.error("initSession error:", e);
       } finally {
-        setLoading(false);
+        if(isMounted) setLoading(false);
       }
     };
 
@@ -52,6 +54,8 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if(!isMounted) return;
+
       setSession(session);
 
       if (session?.user) {
@@ -60,10 +64,12 @@ export function AuthProvider({ children }) {
         setProfile(null);
         setProfileLoading(false);
       }
-      setLoading(false);
+
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription.unsubscribe();}
   }, []);
 
   const signUp = async (name, email, password) => {
