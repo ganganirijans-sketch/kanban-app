@@ -16,7 +16,7 @@ export default function AuthCallback() {
       }
     });
 
-    const timeout = setTimeOut(() => {
+    const timeout = setTimeout(() => {
       toast.error("Authentication timed out");
       navigate("/login", {replace: true});
     }, 8000);
