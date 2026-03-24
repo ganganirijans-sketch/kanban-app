@@ -7,45 +7,23 @@ export default function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleSession = async () => {
+    const code = new URL(window.location.href).searchParams.get("code");
 
-      try {
-        const requestUrl = new URL(window.location.href);
-        const code = requestUrl.searchParams.get("code");
-        if(code){
-
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
-          if(error){
-            console.log("Exchange error: ", error)
-            toast.error("Authentication failed");
-            navigate("/login", { replace: true });
-            return;
-          }
-          await new Promise((res) => setTimeout(res, 200))
-        }
-
-        const { data, error } = await supabase.auth.getSession();
-        if (error) {
-          console.error(error);
-          console.log("Authentication failed: ", error);
-          navigate("/login", { replace: true });
-          return;
-        }
-
-        if (data.session) {
-          toast.success("Signed in!");
-          navigate("/dashboard", { replace: true });
-        } else {
-          toast.error("No session found");
-          navigate("/login", { replace: true });
-        }
-      } catch (err) {
-        console.error(err);
+    if (!code) {
+      toast.error("No auth found");
+      navigate("/login", { replace: true });
+      return;
+    }
+    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+      if (error) {
+        console.error("Exchange error: ", error);
+        toast.error("Authentication failed: " + error.message);
         navigate("/login", { replace: true });
+      } else {
+        toast.error("Signed in");
+        navigate("/dashboard", { replace: true });
       }
-    };
-
-    handleSession();
+    });
   }, []);
 
   return (

@@ -33,43 +33,30 @@ export function AuthProvider({ children }) {
   };
   useEffect(() => {
     let isMounted = true;
-    const initSession = async () => {
-      try {
-        const { data } = await supabase.auth.getSession();
-        if (!isMounted)  return;
-        setSession(data.session);
+        supabase.auth.getSession().then(({data}) =>{
+          if(!isMounted) return;
+          setSession(data.session);
+          setLoading(false);
+          if(data.session?.user) fetchProfile(data.session.user);
+        }).catch(() =>{
+          if(isMounted) setLoading(false);
+        });
 
-        if (data.session?.user) {
-          await fetchProfile(data.session.user);
-        }
-      } catch (e) {
-        console.error("initSession error:", e);
-      } finally {
-        if(isMounted) setLoading(false);
-      }
-    };
-
-    initSession();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      if(!isMounted) return;
-
-      setSession(session);
-
-      if (session?.user) {
-        await fetchProfile(session.user);
-      } else {
-        setProfile(null);
-        setProfileLoading(false);
-      }
-
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();}
+        const { data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) =>{
+          if(!isMounted) return;  
+          setSession(session);
+          setLoading(false);   
+          if(session?.user){
+            fetchProfile(session.user);
+          } else {
+            setProfile(null);
+            setProfileLoading(false);
+          }   
+        });
+        return () => {
+          isMounted = false;
+          subscription.unsubscribe();
+        };
   }, []);
 
   const signUp = async (name, email, password) => {
