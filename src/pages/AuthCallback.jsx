@@ -5,23 +5,30 @@ import toast from "react-hot-toast";
 
 export default function AuthCallback() {
   const navigate = useNavigate();
-
+  const [error, setError] = useState(null)
+  
   useEffect(() => {
-    if(loading) return;
-    if(user) {
-      toast.success("Signed In")
-      navigate("/dashboard", {replace: true})
+    const code = new URL(window.location.href).searchParams.get("code");
+    if(!code) {
+      toast.error("No auth code found");
+      navigate("/login", { replace: true });
+      return;
     }
-  }, []);
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      toast.error("Sign in failed")
-      navigate("/login", {replace: true})
-    }, 5000);
+    supabase.auth.exchangeCodeForSession(code).then(({ data, error }) => {
+      if (error) {
+        console.log("Exchange error: ", error)
+        setError(error.message)
+        toast.error("Auth failed");
+        navigate("/login", { replace: true });
+        
+      } else if (data.session){
+        toast.error("Signed In");
+        navigate("/dashboard", { replace: true });
+      }
 
-    return () => clearTimeout(timeout);
-  }, []);
+    })
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
