@@ -8,6 +8,8 @@ export default function ProtectedRoute({ children }) {
   if (loading) {
     return null;
   }
+  console.log({user})
+  console.log({loading})
 
   if (!user) return <Navigate to="/login" state={{ from: location }} replace />
   return children
