@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
           if(isMounted) setLoading(false);
         });
 
-        const { data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) =>{
+        const { data: {subscription}} = supabase.auth.onAuthStateChange((_event, session) => {
           if(!isMounted) return;  
           setSession(session);
           setLoading(false);   

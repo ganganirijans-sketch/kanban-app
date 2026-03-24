@@ -7,23 +7,20 @@ export default function AuthCallback() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const code = new URL(window.location.href).searchParams.get("code");
-
-    if (!code) {
-      toast.error("No auth found");
-      navigate("/login", { replace: true });
-      return;
+    if(loading) return;
+    if(user) {
+      toast.success("Signed In")
+      navigate("/dashboard", {replace: true})
     }
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) {
-        console.error("Exchange error: ", error);
-        toast.error("Authentication failed: " + error.message);
-        navigate("/login", { replace: true });
-      } else {
-        toast.error("Signed in");
-        navigate("/dashboard", { replace: true });
-      }
-    });
+  }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      toast.error("Sign in failed")
+      navigate("/login", {replace: true})
+    }, 5000);
+
+    return () => clearTimeout(timeout);
   }, []);
 
   return (
