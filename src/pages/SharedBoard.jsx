@@ -59,7 +59,7 @@ export default function SharedBoard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#3b4a75] via-[#031256] to-black flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#08122e] via-[#031256] to-black flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />
           <p className="text-sm text-gray-500">Loading shared board...</p>
@@ -70,7 +70,7 @@ export default function SharedBoard() {
 
   if (notFound) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#3b4a75] via-[#031256] to-black flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#08122e] via-[#031256] to-black flex items-center justify-center">
         <div className="text-center">
           <p className="text-6xl mb-4">🔍</p>
           <h1 className="text-2xl font-bold text-white/70 mb-2">

@@ -149,7 +149,7 @@ export default function Dashboard() {
     : "";
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#3b4a75] via-[#031256] to-black">
+    <div className="min-h-screen bg-gradient-to-br from-[#08122e] via-[#031256] to-black">
       <Navbar />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-10">

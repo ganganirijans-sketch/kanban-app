@@ -342,7 +342,6 @@ export default function KanbanBoard() {
       over.id === destStatus
         ? colTasks(destStatus).length
         : colTasks(destStatus).findIndex((t) => t.id === over.id);
-    reorderTask(active.id, destStatus, Math.max(destIdx, 0), srcStatus);
   };
 
   const handleDragEnd = ({ active, over }) => {
@@ -393,7 +392,7 @@ export default function KanbanBoard() {
 
   if (projLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#3b4a75] via-[#031256] to-black">
+      <div className="min-h-screen bg-gradient-to-br from-[#08122e] via-[#031256] to-black">
         <Navbar />
         <div className="flex items-center justify-center h-[calc(100vh-64px)]">
           <div className="flex flex-col items-center gap-3">
@@ -406,7 +405,7 @@ export default function KanbanBoard() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#3b4a75] via-[#031256] to-black">
+    <div className="min-h-screen overflow-hidden bg-gradient-to-br from-[#08122e] via-[#031256] to-black">
       <Navbar />
 
       <main className="max-w-[1400px] mx-auto px-4 sm:px-6 py-10">

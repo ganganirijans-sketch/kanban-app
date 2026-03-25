@@ -88,7 +88,7 @@ export default function Signup() {
     },
   ];
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#3b4a75] via-[#031256] to-black flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#08122e] via-[#031256] to-black flex flex-col">
       <main className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-md">
           {/* Card */}
